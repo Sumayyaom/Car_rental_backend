@@ -6,24 +6,34 @@ import reviewModel from '../models/review.js';
 import paymentModel from '../models/payment.js';
 import dotenv from 'dotenv';
 import jwt from 'jsonwebtoken';
+import { cloudinaryInstance } from '../config/cloudinaryConfig.js';
+
 
 dotenv.config();
 const JWT_SECRET = process.env.JWT_SECRET; // Use an environment variable for production
 
 const signUp = async(req,res) => {
-    const data = req.body
-    console.log(data);
+    const data = req.body;
 
-    // Hash the password
-    const saltRounds = 10;  // You can adjust the salt rounds as needed
-    const hashedPassword = await bcrypt.hash(data.password, saltRounds);
+    // // Hash the password
+    // const saltRounds = 10;  
+    // const hashedPassword = await bcrypt.hash(data.password, saltRounds);
 
-    // Replace the plain password with the hashed one
-    data.password = hashedPassword;
+    // // Replace the plain password with the hashed one
+    // data.password = hashedPassword;
+
+    // Upload an image
+    const uploadResult = await cloudinaryInstance.uploader.upload(req.file.path,{folder: "user"}).catch((error) => {
+        console.log(error);
+    });
 
     const  toSave = new userModel(data);
-    await toSave.save();
-    res.status(200).send("User registered succesfully");
+    if(uploadResult?.url){
+        toSave.profilepicture = uploadResult.url;
+    }
+        await toSave.save();
+        res.status(200).send("User registered succesfully"); 
+    
 }
 
 // const login = async(req,res) => {
@@ -47,7 +57,6 @@ const signUp = async(req,res) => {
 
 const login = async (req, res) => {
     const data = req.body;
-    console.log(data);
 
     // Find user by email
     const user = await userModel.findOne({ email: data.email });
@@ -72,18 +81,19 @@ const login = async (req, res) => {
             expiresIn: '1h' 
         } // Token expires in 1 hour
     );
-
+     
+    res.cookie("Token",token)
     // Send token to the client
     res.status(200).send({
         status: true,
         message: "Login successful",
-        token: token // Include the token in the response
+        token : token
     });
 };
 
 
 const logout = async(req, res) => {
-    res.clearCookie('token'); // Clear the token cookie
+    res.clearCookie('Token'); // Clear the token cookie
     res.status(200).send({ status: true, message: 'Logout successful' });
 };
 
@@ -171,4 +181,18 @@ const payment = async(req,res) => {
     res.status(200).send("Payment succesfull");
 }
 
-export {signUp,login,updateUser,bookCar,review,deleteBookings,payment,logout}
+
+const checkUser = async(req,res,next) =>{
+    try{
+        const user = req.user;
+
+        if(!user){
+            return res.status(400).json({status:false, message :"user not authenticated"});
+        }
+        res.json({status:true, message :"user authenticated"});
+    }catch(error){
+        res.status(error.status || 500).json({ message: error.message || "Internal server error"});
+    }
+};
+
+export {signUp,login,updateUser,bookCar,review,deleteBookings,payment,logout,checkUser}

@@ -1,10 +1,19 @@
+import { cloudinaryInstance } from '../config/cloudinaryConfig.js';
 import carModel from '../models/car.js';
 import reviewModel from '../models/review.js';
 
 const addCar = async(req,res) => {
         const data = req.body;
         console.log(data);
-        const toSave = new carModel(data);
+         // Upload an image
+    const uploadResult = await cloudinaryInstance.uploader.upload(req.file.path,{folder: "car"}).catch((error) => {
+        console.log(error);
+    });
+    const toSave = new carModel(data);
+    if(uploadResult?.url){
+        toSave.photo = uploadResult.url;
+    }
+        
         await toSave.save();
         res.status(200).send('Car registered successfully');  
 };

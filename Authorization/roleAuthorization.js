@@ -8,7 +8,9 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_key';
 // Middleware to check user role
 const authorizeRoles = (...roles) => {
     return (req, res, next) => {
-        const token = req.headers['authorization']?.split(' ')[1];
+        //const token = req.headers['authorization']?.split(' ')[1];
+        const token = req.cookies.Token;
+
         
         if (!token) {
             return res.status(401).send({ status: false, message: 'No token provided' });
