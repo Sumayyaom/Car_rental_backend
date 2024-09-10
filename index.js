@@ -9,7 +9,7 @@ const app = express();
 dotenv.config();
 
 app.use(cors({
-  origin: "https://car-rental-frontend-woad.vercel.app/",
+  origin: 'https://car-rental-frontend-woad.vercel.app',
   credentials: true,
 }))
 app.use(express.json());
