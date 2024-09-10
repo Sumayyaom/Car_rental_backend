@@ -26,5 +26,4 @@ const CheckoutPayment = async(req,res) => {
       res.status(500).send('Payment failed');
     }
   };
-
   export {CheckoutPayment}
