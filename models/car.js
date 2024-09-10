@@ -2,7 +2,6 @@ import mongoose, { Schema } from "mongoose";
 
 const ObjectId = Schema.ObjectId;
 const carSchema = new Schema({
-    carId : ObjectId,
     name :{
         type : String,
         required : [true, "Please enter the car name"]

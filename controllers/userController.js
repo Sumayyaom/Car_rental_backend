@@ -74,6 +74,7 @@ const login = async (req, res) => {
     const token = jwt.sign(
         { 
             userId: user._id, 
+            userName: user.username,
             email: user.email, 
             role: user.role}, // Payload
         JWT_SECRET, // Secret key
@@ -83,22 +84,30 @@ const login = async (req, res) => {
     );
      
     res.cookie("Token",token)
+
+    res.cookie("userId", user._id.toString(), {
+        httpOnly: false, // Accessible to client-side scripts
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "Strict",
+    });
+
     // Send token to the client
     res.status(200).send({
         status: true,
         message: "Login successful",
-        token : token
+        token : token,
+        role : user.role
     });
 };
 
 
 const logout = async(req, res) => {
     res.clearCookie('Token'); // Clear the token cookie
-    res.status(200).send({ status: true, message: 'Logout successful' });
+    res.status(200).send({ status: true, message: 'Logout successful'});
 };
 
 const updateUser = async(req,res) =>{
-    const id = req.params.id;
+    const id = req.user.userId;
     const newdata = req.body;
     if (!id || !newdata) {
         return res.status(400).send({ message: 'Invalid ID or data' });
@@ -106,6 +115,15 @@ const updateUser = async(req,res) =>{
 
     // Ensure that _id is not included in newdata
     delete newdata._id;
+
+    if (req.file) {
+        newdata.photo = await cloudinaryInstance.uploader.upload(req.file.path,{folder: "user"}).catch((error) => {
+            console.log(error);
+        });
+       
+      }
+
+
 
     const data = await userModel.findByIdAndUpdate(id,newdata,{new : true});
     if (!data) {
@@ -115,8 +133,44 @@ const updateUser = async(req,res) =>{
     res.status(200).send({data:data, message : 'Updated Successfully'});
 }
 
+// const updateUser = async (req, res) => {
+//     const id = req.user.userId;
+//     const newData = req.body;
+  
+//     if (!id) {
+//       return res.status(400).send({ message: 'Invalid ID' });
+//     }
+  
+//     try {
+//       // Find the user by ID
+//       const existingUser = await userModel.findById(id);
+  
+//       if (!existingUser) {
+//         return res.status(404).send({ message: 'User not found' });
+//       }
+  
+//       // Merge newData with the existing user data
+//       const updatedUser = {
+//         username: newData.username || existingUser.username,
+//         email: newData.email || existingUser.email,
+//         phone: newData.phone || existingUser.phone,
+//         address: newData.address || existingUser.address,
+//         role: newData.role || existingUser.role,
+//         profilepicture: req.file ? req.file.filename : existingUser.profilepicture, // If the user uploads a new file
+//       };
+  
+//       // Update user in the database
+//       const updatedData = await userModel.findByIdAndUpdate(id, updatedUser, { new: true });
+      
+//       res.status(200).send({ data: updatedData, message: 'Updated Successfully' });
+//     } catch (error) {
+//       res.status(500).send({ message: 'Error updating user', error });
+//     }
+//   };
+  
+
 const bookCar = async(req,res) => {
-    const {userid,licenseno,carid,pickupdate,dropoffdate,totaldays,totalprice,paymentstatus} = req.body;
+    const {userid,carid,pickupdate,dropoffdate,totaldays,totalprice} = req.body;
     const username = await userModel.findById(userid);
     if (!username) {
         return res.status(404).json({ message: 'User not found' });
@@ -130,23 +184,25 @@ const bookCar = async(req,res) => {
     const toSave = new bookingModel({
         userid,
         username: username.username,
-        licenseno,
         carid,
         carname: carname.name,
+        carphoto: carname.photo,
         pickupdate,
         dropoffdate,
         totaldays,
         totalprice,
-        paymentstatus
     })
     await toSave.save();
     res.status(200).send("Booking Successfull");
 }
 
 const deleteBookings = async(req,res) =>{
-    const id = req.params.id;
-    const data = await bookingModel.findByIdAndDelete(id)
-    res.status(200).send({ message : 'Booking Deleted Succesfully'})
+    const { userId } = req.user;
+    const data = await bookingModel.findByIdAndDelete(userId)
+    if (!data) {
+        return res.status(404).json({ success: false, message: "User not found" });
+    }
+    res.status(200).send({ message : 'Booking Deleted Succesfully',data: data})
 }
 
 const review = async(req,res) => {
@@ -195,4 +251,23 @@ const checkUser = async(req,res,next) =>{
     }
 };
 
-export {signUp,login,updateUser,bookCar,review,deleteBookings,payment,logout,checkUser}
+const profile = async(req,res,next) =>{
+    try {
+        // Get user ID or email from the decoded token
+        const { userId } = req.user;
+
+        // Fetch user data from the database using the ID from the token
+        const user = await userModel.findById(userId); 
+
+        if (!user) {
+            return res.status(404).json({ success: false, message: "User not found" });
+        }
+
+        res.json({ success: true, message: "User data fetched", data: user });
+    } catch (error) {
+        res.status(error.status || 500).json({ message: error.message || "Internal server error" });
+    }
+}
+
+
+export {signUp,login,updateUser,bookCar,review,deleteBookings,payment,logout,checkUser,profile}

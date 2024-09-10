@@ -1,8 +1,6 @@
 import mongoose, { Schema } from "mongoose";
 
-const ObjectId = Schema.ObjectId;
 const bookingSchema = new Schema({
-    bookingId : ObjectId,
     userid :{
         type : mongoose.Types.ObjectId,
         ref : "User"
@@ -10,15 +8,14 @@ const bookingSchema = new Schema({
     username : {
         type : String
     },
-    licenseno : {
-        type : String,
-        required : [true, "Please enter your license number"]
-    },
     carid : {
         type : mongoose.Types.ObjectId,
         ref : "Car"
     },
     carname : {
+        type : String
+    },
+    carphoto : {
         type : String
     },
     pickupdate : {
@@ -34,7 +31,7 @@ const bookingSchema = new Schema({
         required : [true, "Please enter the total days"]
     },
     totalprice : {
-        type : String,
+        type : Number,
         required : [true, "Please enter the total price"]
     },
  },

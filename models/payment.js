@@ -1,9 +1,8 @@
 import mongoose, { Mongoose, Schema } from "mongoose";
 
 const paymentSchema = new mongoose.Schema({
-    paymentId: Schema.ObjectId,
     amount: {
-        type: String,
+        type: Number,
         required : [true, "Please enter the amount"]
     },
     paymentMethod: {
@@ -12,7 +11,7 @@ const paymentSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ['pending', 'completed', 'failed'],
+        enum: ['pending', 'succeeded', 'failed'],
         required : [true, "Please enter the status (pending,completed,failed)"]
     },
     transactionDate: {
@@ -22,18 +21,20 @@ const paymentSchema = new mongoose.Schema({
     receiptUrl: {
         type: String
     },
-    userId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        required: true
-    },
-    bookingId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Booking',
-        required: true
-    },
+    // userId: {
+    //     type: mongoose.Schema.Types.ObjectId,
+    //     ref: 'User',
+        
+    // },
+    // bookingId: {
+    //     type: mongoose.Schema.Types.ObjectId,
+    //     ref: 'Booking',
+       
+    // },
     transactionId: {
-        type: String
+        type: String,
+        unique: true,
+        required: true
     }
 });
 
