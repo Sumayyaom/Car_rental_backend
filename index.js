@@ -9,7 +9,7 @@ const app = express();
 dotenv.config();
 
 app.use(cors({
-  origin: 'http://localhost:5173',
+  origin: 'https://car-rental-backend-gamma.vercel.app',
   credentials: true,
 }))
 app.use(express.json());
