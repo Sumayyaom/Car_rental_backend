@@ -157,7 +157,6 @@ const review = async(req,res) => {
     if (!username) {
         return res.status(404).json({ message: 'User not found' });
     }
-
     const carname = await carModel.findById(carid);
     if (!carname) {
         return res.status(404).json({ message: 'Car not found' });
@@ -167,7 +166,7 @@ const review = async(req,res) => {
         userid,
         username: username.username,
         carid,
-        carname: carname.name,
+        carname: carname.carname,
         rating,
         reviewstring
     })
@@ -233,5 +232,10 @@ const booking = async(req,res) => {
     }
 }
 
+const reviewBookedCar = async(req,res) =>{
+    const id = req.params.id;
+    const data = await bookingModel.findById(id)
+    res.status(200).send({data:data, message : 'booking fetched'})
+}
 
-export {signUp,login,updateUser,bookCar,review,deleteBookings,payment,logout,checkUser,profile,booking}
+export {signUp,login,updateUser,bookCar,review,deleteBookings,payment,logout,checkUser,profile,booking,reviewBookedCar}

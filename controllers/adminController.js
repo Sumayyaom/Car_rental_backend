@@ -43,6 +43,12 @@ const viewReviews = async(req,res) => {
     res.status(200).send({data:data});
 }
 
+const deletereview = async(req,res) =>{
+    const {id} = req.params;
+    const data = await reviewModel.findByIdAndDelete(id)
+    res.status(200).send({data:data, message : 'review Deleted Succesfully'})
+}
+
 const viewPayments = async(req,res) => {
     const data = await paymentModel.find({});
     res.status(200).send({data:data});
@@ -54,4 +60,4 @@ const deletePayment = async(req,res) =>{
     res.status(200).send({data:data, message : 'Payment Deleted Succesfully'})
 }
 
-export {viewUser,deleteUser,viewReviews,viewBookings,viewPayments,deletePayment, deleteBooking}
+export {viewUser,deleteUser,viewReviews,viewBookings,viewPayments,deletePayment, deleteBooking,deletereview}

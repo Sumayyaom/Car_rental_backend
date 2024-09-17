@@ -1,7 +1,7 @@
 import express from 'express';
 import asyncHandler from '../utils/asyncHandler.js';
 import { authorizeRoles } from '../Authorization/roleAuthorization.js';
-import { deleteBooking, deletePayment, deleteUser, viewBookings, viewPayments, viewReviews, viewUser } from '../controllers/adminController.js';
+import { deleteBooking, deletePayment, deletereview, deleteUser, viewBookings, viewPayments, viewReviews, viewUser } from '../controllers/adminController.js';
 const adminRouter = express.Router();
 
 adminRouter.get('/viewuser',authorizeRoles("admin","user"),asyncHandler(viewUser))
@@ -11,5 +11,6 @@ adminRouter.get('/viewuser',authorizeRoles("admin","user"),asyncHandler(viewUser
           .get('/viewreviews',authorizeRoles("admin"),asyncHandler(viewReviews))
           .get('/viewpayments',authorizeRoles("admin"),asyncHandler(viewPayments))
           .delete('/deletepayment/:id',authorizeRoles("admin"),asyncHandler(deletePayment))
+          .delete('/deletereview/:id',authorizeRoles("admin"),asyncHandler(deletereview))
 
 export default adminRouter
