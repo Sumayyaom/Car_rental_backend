@@ -10,7 +10,7 @@ import { cloudinaryInstance } from '../config/cloudinaryConfig.js';
 
 
 dotenv.config();
-const JWT_SECRET = process.env.JWT_SECRET; // Use an environment variable for production
+const JWT_SECRET = process.env.JWT_SECRET; 
 
 const signUp = async(req,res) => {
     const data = req.body;
@@ -36,24 +36,6 @@ const signUp = async(req,res) => {
     
 }
 
-// const login = async(req,res) => {
-//     const data = req.body
-//     console.log(data);
-
-//      // Find user by email
-//      const user = await userModel.findOne({ email: data.email });
-//      if (!user) {
-//          return res.status(404).send({ status: false, message: "User not found" });
-//      }
-
-//      // Compare the provided password with the hashed password
-//      const isPasswordValid = await bcrypt.compare(data.password, user.password);
-//      if (!isPasswordValid) {
-//          return res.status(401).send({ status: false, message: "Invalid password" });
-//      }
-
-//     res.status(200).send({status:true,message:"Login successfull"});
-// }
 
 const login = async (req, res) => {
     const data = req.body;
@@ -132,42 +114,6 @@ const updateUser = async(req,res) =>{
 
     res.status(200).send({data:data, message : 'Updated Successfully'});
 }
-
-// const updateUser = async (req, res) => {
-//     const id = req.user.userId;
-//     const newData = req.body;
-  
-//     if (!id) {
-//       return res.status(400).send({ message: 'Invalid ID' });
-//     }
-  
-//     try {
-//       // Find the user by ID
-//       const existingUser = await userModel.findById(id);
-  
-//       if (!existingUser) {
-//         return res.status(404).send({ message: 'User not found' });
-//       }
-  
-//       // Merge newData with the existing user data
-//       const updatedUser = {
-//         username: newData.username || existingUser.username,
-//         email: newData.email || existingUser.email,
-//         phone: newData.phone || existingUser.phone,
-//         address: newData.address || existingUser.address,
-//         role: newData.role || existingUser.role,
-//         profilepicture: req.file ? req.file.filename : existingUser.profilepicture, // If the user uploads a new file
-//       };
-  
-//       // Update user in the database
-//       const updatedData = await userModel.findByIdAndUpdate(id, updatedUser, { new: true });
-      
-//       res.status(200).send({ data: updatedData, message: 'Updated Successfully' });
-//     } catch (error) {
-//       res.status(500).send({ message: 'Error updating user', error });
-//     }
-//   };
-  
 
 const bookCar = async(req,res) => {
     const {userid,carid,pickupdate,dropoffdate,totaldays,totalprice} = req.body;
@@ -269,5 +215,23 @@ const profile = async(req,res,next) =>{
     }
 }
 
+const booking = async(req,res) => {
+    try {
+        // Get user ID or email from the decoded token
+        const { userId } = req.user;
 
-export {signUp,login,updateUser,bookCar,review,deleteBookings,payment,logout,checkUser,profile}
+        // Fetch user data from the database using the ID from the token
+        const booking = await bookingModel.find({userid: userId}); 
+
+        if (!booking) {
+            return res.status(404).json({ success: false, message: "No bookings" });
+        }
+
+        res.json({ success: true, message: "Bookings fetched", data: booking });
+    } catch (error) {
+        res.status(error.status || 500).json({ message: error.message || "Internal server error" });
+    }
+}
+
+
+export {signUp,login,updateUser,bookCar,review,deleteBookings,payment,logout,checkUser,profile,booking}

@@ -21,16 +21,6 @@ const paymentSchema = new mongoose.Schema({
     receiptUrl: {
         type: String
     },
-    // userId: {
-    //     type: mongoose.Schema.Types.ObjectId,
-    //     ref: 'User',
-        
-    // },
-    // bookingId: {
-    //     type: mongoose.Schema.Types.ObjectId,
-    //     ref: 'Booking',
-       
-    // },
     transactionId: {
         type: String,
         unique: true,

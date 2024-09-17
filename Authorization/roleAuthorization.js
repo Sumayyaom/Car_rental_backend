@@ -8,7 +8,6 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_key';
 // Middleware to check user role
 const authorizeRoles = (...roles) => {
     return (req, res, next) => {
-        //const token = req.headers['authorization']?.split(' ')[1];
         const token = req.cookies.Token;
 
         
@@ -21,8 +20,8 @@ const authorizeRoles = (...roles) => {
             const userRole = decoded.role;
 
             if (roles.includes(userRole)) {
-                req.user = decoded; // Attach decoded user data to the request
-                next(); // User is authorized, proceed to the next middleware or route handler
+                req.user = decoded; 
+                next(); 
             } else {
                 res.status(403).send({ status: false, message: 'Access denied' });
             }

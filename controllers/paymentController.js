@@ -1,23 +1,22 @@
 import Stripe from 'stripe';
 import dotenv from 'dotenv';
 
-dotenv.config();  // Load environment variables
+dotenv.config();  
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY); 
 
 const CheckoutPayment = async(req,res) => {
-    const { totalPrice } = req.body;  // Get totalPrice from frontend
+    const { totalPrice } = req.body; 
   
     try {
       const paymentIntent = await stripe.paymentIntents.create({
-        amount: totalPrice * 100, // Convert to cents
+        amount: totalPrice * 100, 
         currency: 'inr',
         automatic_payment_methods: {
           enabled: true,
         },
       });
   
-      // Send the client secret to the frontend
       res.send({
         clientSecret: paymentIntent.client_secret,
       });

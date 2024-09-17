@@ -83,7 +83,7 @@ const viewCar = async(req,res) =>{
 
 const search = async(req,res) => {
     const {name} = req.query;
-    const getcars = await carModel.find({location : String(name)});
+    const getcars = await carModel.find({location: { $regex: new RegExp(name.toLowerCase(), 'i') }});
     res.status(200).send({data:getcars});
 }
 

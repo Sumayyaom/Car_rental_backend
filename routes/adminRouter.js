@@ -7,7 +7,7 @@ const adminRouter = express.Router();
 adminRouter.get('/viewuser',authorizeRoles("admin"),asyncHandler(viewUser))
           .delete('/deleteuser/:id',authorizeRoles("admin"),asyncHandler(deleteUser))
           .get('/viewbookings',authorizeRoles("admin"),asyncHandler(viewBookings))
-          .delete('/deletebooking/:id',authorizeRoles("admin"),asyncHandler(deleteBooking))
+          .delete('/deletebooking/:id',authorizeRoles("admin","user"),asyncHandler(deleteBooking))
           .get('/viewreviews',authorizeRoles("admin"),asyncHandler(viewReviews))
           .get('/viewpayments',authorizeRoles("admin"),asyncHandler(viewPayments))
           .delete('/deletepayment/:id',authorizeRoles("admin"),asyncHandler(deletePayment))
