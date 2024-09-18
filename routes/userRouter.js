@@ -15,8 +15,7 @@ userRouter.post('/signup', upload.single("profilepicture"),asyncHandler(signUp))
         .delete('/deletebooking/:id',authorizeRoles("user"),asyncHandler(deleteBookings))
         .post('/payment',authorizeRoles("user"),asyncHandler(payment))
         .get('/check-user',authorizeRoles("admin","user"),asyncHandler(checkUser))
-        .get('/profile',asyncHandler(profile))
+        .get('/profile',authorizeRoles("admin","user"),asyncHandler(profile))
         .get('/bookings',authorizeRoles("admin","user"),asyncHandler(booking))
         .get('/reviewbookedcar/:id',asyncHandler(reviewBookedCar))
-
 export default userRouter

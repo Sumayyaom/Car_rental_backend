@@ -12,5 +12,4 @@ adminRouter.get('/viewuser',asyncHandler(viewUser))
           .get('/viewpayments',authorizeRoles("admin"),asyncHandler(viewPayments))
           .delete('/deletepayment/:id',authorizeRoles("admin"),asyncHandler(deletePayment))
           .delete('/deletereview/:id',authorizeRoles("admin"),asyncHandler(deletereview))
-
 export default adminRouter
