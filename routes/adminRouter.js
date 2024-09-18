@@ -4,9 +4,9 @@ import { authorizeRoles } from '../Authorization/roleAuthorization.js';
 import { deleteBooking, deletePayment, deletereview, deleteUser, viewBookings, viewPayments, viewReviews, viewUser } from '../controllers/adminController.js';
 const adminRouter = express.Router();
 
-adminRouter.get('/viewuser',authorizeRoles("admin","user"),asyncHandler(viewUser))
+adminRouter.get('/viewuser',asyncHandler(viewUser))
           .delete('/deleteuser/:id',authorizeRoles("admin"),asyncHandler(deleteUser))
-          .get('/viewbookings',authorizeRoles("admin","user"),asyncHandler(viewBookings))
+          .get('/viewbookings',asyncHandler(viewBookings))
           .delete('/deletebooking/:id',authorizeRoles("admin","user"),asyncHandler(deleteBooking))
           .get('/viewreviews',authorizeRoles("admin"),asyncHandler(viewReviews))
           .get('/viewpayments',authorizeRoles("admin"),asyncHandler(viewPayments))
