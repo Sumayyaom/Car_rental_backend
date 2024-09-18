@@ -65,7 +65,11 @@ const login = async (req, res) => {
         } // Token expires in 1 hour
     );
      
-    res.cookie("Token",token)
+    res.cookie("Token",token, {
+        httpOnly: false, // Accessible to client-side scripts
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "Strict",
+    })
 
     res.cookie("userId", user._id.toString(), {
         httpOnly: false, // Accessible to client-side scripts
