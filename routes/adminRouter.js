@@ -5,7 +5,7 @@ import { deleteBooking, deletePayment, deletereview, deleteUser, viewBookings, v
 const adminRouter = express.Router();
 
 adminRouter.get('/viewuser',asyncHandler(viewUser))
-          .delete('/deleteuser/:id',authorizeRoles("admin"),asyncHandler(deleteUser))
+          .delete('/deleteuser/:id',authorizeRoles("admin","user"),asyncHandler(deleteUser))
           .get('/viewbookings',asyncHandler(viewBookings))
           .delete('/deletebooking/:id',authorizeRoles("admin","user"),asyncHandler(deleteBooking))
           .get('/viewreviews',asyncHandler(viewReviews))
