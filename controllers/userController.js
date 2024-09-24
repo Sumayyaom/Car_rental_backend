@@ -12,29 +12,34 @@ import { cloudinaryInstance } from '../config/cloudinaryConfig.js';
 dotenv.config();
 const JWT_SECRET = process.env.JWT_SECRET; 
 
-const signUp = async(req,res) => {
-    const data = req.body;
+const signUp = async (req, res) => {
+    try {
+        const data = req.body;
 
-    // // Hash the password
-    // const saltRounds = 10;  
-    // const hashedPassword = await bcrypt.hash(data.password, saltRounds);
+        const existingUser = await userModel.findOne({ email: data.email });
+        if (existingUser) {
+            return res.status(400).json({ success:false, message: "Email is already registered. Please use a different email" });
+        }
 
-    // // Replace the plain password with the hashed one
-    // data.password = hashedPassword;
+        const uploadResult = await cloudinaryInstance.uploader.upload(req.file.path, { folder: "user" }).catch((error) => {
+            console.log(error);
+            return res.status(500).json({message: "Image upload failed." });
+        });
 
-    // Upload an image
-    const uploadResult = await cloudinaryInstance.uploader.upload(req.file.path,{folder: "user"}).catch((error) => {
-        console.log(error);
-    });
+        const toSave = new userModel(data);
 
-    const  toSave = new userModel(data);
-    if(uploadResult?.url){
-        toSave.profilepicture = uploadResult.url;
-    }
+        if (uploadResult?.url) {
+            toSave.profilepicture = uploadResult.url;
+        }
         await toSave.save();
-        res.status(200).send("User registered succesfully"); 
-    
-}
+        res.status(200).json({ success:true, message: "User registered successfully" });
+
+    } catch (error) {
+        console.error("Error during sign up:", error);
+        res.status(500).json({message: "Something went wrong during sign up. Please try again." });
+    }
+};
+
 
 
 const login = async (req, res) => {
