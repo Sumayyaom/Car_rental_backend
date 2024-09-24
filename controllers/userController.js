@@ -18,7 +18,7 @@ const signUp = async (req, res) => {
 
         const existingUser = await userModel.findOne({ email: data.email });
         if (existingUser) {
-            return res.status(400).json({ success:false, message: "Email is already registered. Please use a different email" });
+            return res.status(400).json({message: "Email is already registered. Please use a different email" });
         }
 
         const uploadResult = await cloudinaryInstance.uploader.upload(req.file.path, { folder: "user" }).catch((error) => {
