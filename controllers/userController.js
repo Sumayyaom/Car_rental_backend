@@ -73,14 +73,16 @@ const login = async (req, res) => {
     res.cookie("Token",token, {
         httpOnly: false, // Accessible to client-side scripts
         secure: process.env.NODE_ENV === "production",
-        sameSite: "None",
+        sameSite: "Strict"
     })
+    // sameSite: "None",
 
     res.cookie("userId", user._id.toString(), {
         httpOnly: false, // Accessible to client-side scripts
         secure: process.env.NODE_ENV === "production",
-        sameSite: "None",
+        sameSite: "Strict"
     });
+    // sameSite: "None"
 
     // Send token to the client
     res.status(200).send({
@@ -125,7 +127,7 @@ const updateUser = async(req,res) =>{
 }
 
 const bookCar = async(req,res) => {
-    const {userid,carid,pickupdate,dropoffdate,totaldays,totalprice} = req.body;
+    const {userid,carid,pickupdate,dropoffdate,totaldays,totalprice,paymentstatus} = req.body;
     const username = await userModel.findById(userid);
     if (!username) {
         return res.status(404).json({ message: 'User not found' });
@@ -146,10 +148,42 @@ const bookCar = async(req,res) => {
         dropoffdate,
         totaldays,
         totalprice,
+        paymentstatus
     })
-    await toSave.save();
-    res.status(200).send("Booking Successfull");
+    const savedBooking = await toSave.save();
+    res.status(200).send({message: 'Booking successful', bookingId: savedBooking._id});
 }
+
+const updatePaymentStatus = async (req, res) => {
+    const { bookingId, paymentstatus } = req.body;
+    console.log("Booking id in backend===>", bookingId);
+    console.log("Paymentstatus in backend===>", paymentstatus);
+    // Validate input
+    if (!bookingId || !paymentstatus) {
+        return res.status(400).json({ message: 'Booking ID and payment status are required' });
+    }
+
+    try {
+        // Find the booking by ID
+        const booking = await bookingModel.findById(bookingId); // Corrected line
+        if (!booking) {
+            return res.status(404).json({ message: 'Booking not found' });
+        }
+
+        // Update the payment status
+        booking.paymentstatus = paymentstatus;
+
+        // Save the updated booking
+        await booking.save();
+
+        res.status(200).json({ message: 'Payment status updated successfully', booking });
+    } catch (error) {
+        console.error('Error updating payment status:', error); // More informative error log
+        res.status(500).json({ message: 'Server error, could not update payment status', error: error.message });
+    }
+};
+
+
 
 const deleteBookings = async(req,res) =>{
     const { userId } = req.user;
@@ -247,4 +281,4 @@ const reviewBookedCar = async(req,res) =>{
     res.status(200).send({data:data, message : 'booking fetched'})
 }
 
-export {signUp,login,updateUser,bookCar,review,deleteBookings,payment,logout,checkUser,profile,booking,reviewBookedCar}
+export {signUp,login,updateUser,bookCar,review,deleteBookings,payment,logout,checkUser,profile,booking,reviewBookedCar,updatePaymentStatus }

@@ -34,6 +34,9 @@ const bookingSchema = new Schema({
         type : Number,
         required : [true, "Please enter the total price"]
     },
+    paymentstatus: {
+        type : String
+    }
  },
  {
     timestamps : true
