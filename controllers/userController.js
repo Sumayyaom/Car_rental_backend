@@ -73,14 +73,14 @@ const login = async (req, res) => {
     res.cookie("Token",token, {
         httpOnly: false, // Accessible to client-side scripts
         secure: process.env.NODE_ENV === "production",
-        sameSite: "Strict"
+        sameSite: "None"
     })
     // sameSite: "None",
 
     res.cookie("userId", user._id.toString(), {
         httpOnly: false, // Accessible to client-side scripts
         secure: process.env.NODE_ENV === "production",
-        sameSite: "Strict"
+        sameSite: "None"
     });
     // sameSite: "None"
 
